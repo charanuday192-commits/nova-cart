@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NOVA Reliability</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f5fb;--card:#fff;--ink:#1e1b3a;--mut:#6b6785;--line:#e4e0f7;--pri:#5b4bd5;--prid:#4636b8;--soft:#eeebff;--hd:#1b1445;--okb:#d9f5e5;--okf:#0c6b3a;--wb:#fdf0c9;--wf:#8a5a00;--bb:#fde0e0;--bf:#a11d1d}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12101f;--card:#1c1930;--ink:#ece9ff;--mut:#a29fc0;--line:#322d52;--soft:#2a2550;--okb:#12392a;--okf:#7be0a8;--wb:#3e3210;--wf:#f2c864;--bb:#47191d;--bf:#ff9a9a}}
+:root[data-theme="dark"]{--bg:#12101f;--card:#1c1930;--ink:#ece9ff;--mut:#a29fc0;--line:#322d52;--soft:#2a2550;--okb:#12392a;--okf:#7be0a8;--wb:#3e3210;--wf:#f2c864;--bb:#47191d;--bf:#ff9a9a}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--hd);color:#fff;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+.bar0{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}
+.logo{font-weight:800;font-size:18px}.logo b{color:#b7acff}
+nav{display:flex;flex-wrap:wrap;gap:4px}nav button{background:none;border:0;color:#fff;padding:8px 12px;border-radius:10px;font:600 14px inherit;font-family:inherit;cursor:pointer}
+nav button.on{background:var(--pri)}
+h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:0;max-width:760px}
+h2{margin:0 0 6px;font-size:20px}
+.hero{background:linear-gradient(135deg,#4f3fcf,#7a3fc0);color:#fff;border-radius:24px;padding:clamp(24px,5vw,48px)}
+.hero p{max-width:620px;color:#e3defe}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.g{display:grid;gap:14px}.g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.g4{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.cols{display:grid;grid-template-columns:2fr 1fr;gap:20px}@media(max-width:860px){.cols{grid-template-columns:1fr}}
+.btn{border:0;border-radius:12px;padding:9px 14px;font:600 13px inherit;font-family:inherit;cursor:pointer;background:var(--pri);color:#fff;transition:transform .1s}
+.btn:active{transform:scale(.96)}.btn:hover{background:var(--prid)}
+.btn.s{background:var(--soft);color:var(--pri)}.btn.d{background:var(--bb);color:var(--bf)}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;margin:2px 4px 2px 0}
+.ok{background:var(--okb);color:var(--okf)}.wn{background:var(--wb);color:var(--wf)}.bd{background:var(--bb);color:var(--bf)}.tag{background:var(--pri);color:#fff}.tg2{background:var(--soft);color:var(--pri)}
+.mut{color:var(--mut);font-size:13px}.big{font-size:26px;font-weight:800}
+.meter{height:8px;border-radius:9px;background:var(--soft);overflow:hidden}.meter i{display:block;height:100%;transition:width .6s}
+.row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start}
+input[type=text],input[type=password],select{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;width:100%}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.chip{padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--pri);font:600 13px inherit;font-family:inherit;cursor:pointer}.chip.on{background:var(--pri);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:7px 8px;text-align:left;border-top:1px solid var(--line)}th{border:0;color:var(--mut)}
+.scroll{overflow-x:auto}.pop{animation:pop .25s ease-out}@keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.bars{display:flex;align-items:flex-end;gap:6px;height:120px}.bars div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:11px;color:var(--mut)}.bars i{display:block;width:100%;border-radius:6px 6px 0 0}
+.warnbox{border:2px solid #e0a800;background:var(--wb)}
+.thumb{width:96px;height:96px;border-radius:12px;object-fit:cover;background:var(--soft);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--pri);font-size:30px;flex:none}.ph{width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin:8px 0}a.btn{text-decoration:none;display:inline-block}
+.opt{display:flex;gap:10px;align-items:center;width:100%;text-align:left;padding:10px 12px;margin:6px 0;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;cursor:pointer}.opt.on{border-color:var(--pri);background:var(--soft)}.opt i{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font:800 12px inherit;font-style:normal;color:#fff;flex:none}
+.spin{width:34px;height:34px;border-radius:50%;border:4px solid var(--soft);border-top-color:var(--pri);margin:0 auto 12px;animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}.pulse{animation:pl 1.6s ease-out infinite;transform-box:fill-box;transform-origin:center}@keyframes pl{from{transform:scale(1);opacity:.6}to{transform:scale(2.6);opacity:0}}
+@media(prefers-reduced-motion:reduce){.pop,.meter i,.spin,.pulse{animation:none;transition:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap bar0"><div class="logo">NOVA <b>Reliability</b></div><nav id="nav"></nav></div></header>
+<main class="wrap" id="app"></main>
+<script>
+// ---------- Synthetic data (NOVA CART case) ----------
+const stores=[
+{id:'s1',name:'Sai Lakshmi Stores',rel:.94,eta:24,dist:1.2,load:.45,local:.9,orders:212,fulfil:94},
+{id:'s2',name:'City Fresh Mart',rel:.88,eta:31,dist:2.1,load:.6,local:.5,orders:340,fulfil:88},
+{id:'s3',name:'Local Basket',rel:.81,eta:35,dist:2.8,load:.35,local:.8,orders:158,fulfil:81},
+{id:'s4',name:'Metro Daily',rel:.9,eta:28,dist:1.8,load:.5,local:.4,orders:275,fulfil:90}];
+const CITY={'Visakhapatnam':[17.6868,83.2185],'Vizianagaram':[18.1067,83.3955],'Srikakulam':[18.2949,83.8938],'Anakapalli':[17.6913,83.0037]};
+const GEO={s1:[17.6935,83.2250],s2:[17.6800,83.2102],s3:[17.7005,83.2060],s4:[17.6760,83.2340]};
+function shopArt(n,h){const e=n.replace(/&/g,'&amp;'),st=[0,1,2,3,4,5,6,7].map(i=>`<rect x="${30+i*32.5}" y="62" width="32.5" height="26" fill="${i%2?'#fff':`hsl(${h} 65% 48%)`}"/>`).join('');
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200"><rect width="320" height="200" fill="hsl(${h} 40% 90%)"/><rect y="160" width="320" height="40" fill="#b9b4a8"/><rect x="30" y="38" width="260" height="122" fill="#f7f2e8"/><rect x="60" y="14" width="200" height="26" rx="5" fill="hsl(${h} 55% 30%)"/><text x="160" y="32" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700" fill="#fff">${e}</text>${st}<rect x="48" y="100" width="90" height="46" fill="#cfe3ee"/><rect x="170" y="96" width="52" height="64" fill="hsl(${h} 45% 35%)"/><rect x="236" y="100" width="40" height="46" fill="#cfe3ee"/><text x="312" y="194" text-anchor="end" font-family="sans-serif" font-size="9" fill="#555">Illustration</text></svg>`;
+ return'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)}
+stores.forEach((s,i)=>{[s.lat,s.lng]=GEO[s.id];s.city='Visakhapatnam';s.addr='Sample position near the city centre';s.photo=shopArt(s.name,[255,150,30,330][i])});
+const LISTED=[['Vizianagaram','Fort Road Fresh Mart',18.1089,83.3921,.92,265],['Vizianagaram','Sri Lakshmi Kirana',18.1031,83.4002,.87,25],['Srikakulam','Seven Roads Daily Needs',18.2975,83.8970,.91,200],['Srikakulam','Palakonda Road Mart',18.2920,83.8895,.85,350],['Anakapalli','Bellam Market Store',17.6942,83.0071,.93,45],['Anakapalli','Nehru Chowk Fresh',17.6881,82.9968,.86,170]]
+ .map(([city,name,lat,lng,rel,h],i)=>({id:'L'+i,name,city,lat,lng,rel,addr:'Sample position near the city centre',photo:shopArt(name,h)}));
+const cat=[['Milk',28,[96,71,82,0]],['Toned Milk',26,[92,85,0,88]],['Curd',35,[90,78,84,80]],['Bread',40,[88,90,70,86]],['Pav',30,[85,0,76,82]],['Eggs (6)',54,[93,80,0,91]],['Paneer',95,[84,91,66,0]],['Atta (5kg)',245,[95,92,88,94]],['Rice (5kg)',320,[90,0,85,93]]];
+const subs={Milk:['Toned Milk','Curd'],'Toned Milk':['Milk','Curd'],Bread:['Pav'],Pav:['Bread'],Curd:['Milk']};
+const base={orders:38500,aov:486,repeat:27,cancel:11,delivery:37,tickets:5900,unavail:35};
+const trend={m:['Apr','May','Jun','Jul','Aug','Sep'],repeat:[41,38,34,31,29,27],cancel:[6,7,8,9,10,11],delivery:[29,31,33,34,36,37],tickets:[3100,3600,4200,4800,5400,5900]};
+let inv=[],exc=[],orders=[],seq=1;
+function seed(){inv=[];exc=[];orders=[];seq=1;
+ cat.forEach(([p,pr,cs])=>cs.forEach((c,i)=>c>0&&inv.push({sid:stores[i].id,p,pr:pr+[0,2,-1,1][i],conf:c,on:true})));
+ inv.filter(i=>i.conf<75).forEach(i=>exc.push({id:seq++,sid:i.sid,p:i.p,conf:i.conf,open:true,why:i.conf<70?'Not updated for 2+ days':'Stock last confirmed 36h ago'}));}
+seed();
+// ---------- Decision engine ----------
+const W={reliable:{inv:.4,rel:.3,eta:.15,dist:.1,cap:.05,local:0},fastest:{inv:.2,rel:.15,eta:.4,dist:.2,cap:.05,local:0},local:{inv:.3,rel:.2,eta:.1,dist:.15,cap:.05,local:.2}};
+const cl=x=>Math.max(0,Math.min(1,x)),pc=x=>Math.round(x*1000)/10;
+function rank(p,mode,ex=[]){const w=W[mode];
+ return inv.filter(i=>i.p===p&&i.on&&!ex.includes(i.sid)).map(i=>{const s=stores.find(x=>x.id===i.sid);
+  const v={inv:i.conf/100,rel:s.rel,eta:cl(1-(s.eta-15)/45),dist:cl(1-s.dist/5),cap:1-s.load,local:s.local};
+  const score=Object.keys(w).reduce((a,k)=>a+w[k]*v[k],0);
+  return{s,p,pr:i.pr,inv:i.conf,rel:pc(s.rel),eta:s.eta,dist:s.dist,load:Math.round(s.load*100),score:pc(score),parts:Object.fromEntries(Object.entries(v).map(([k,x])=>[k,pc(x)]))}})
+ .sort((a,b)=>b.score-a.score).map((r,k)=>({...r,rank:k}));}
+function search(){const q=S.q.trim().toLowerCase();const names=[...new Set(inv.map(i=>i.p))].filter(n=>n.toLowerCase().includes(q));
+ const p=names.find(n=>n.toLowerCase()===q)||names[0];return{p,res:p?rank(p,S.mode):[]};}
+function stockout(){const c=S.cart;const row=inv.find(i=>i.p===c.p&&i.sid===c.sid);row.on=false;row.conf=0;
+ if(!exc.some(e=>e.p===c.p&&e.sid===c.sid&&e.open))exc.push({id:seq++,sid:c.sid,p:c.p,conf:0,open:true,why:'Picker reported item missing during an order'});
+ const alt=rank(c.p,S.mode,[c.sid])[0]||null;const ss=(subs[c.p]||[]).flatMap(p=>rank(p,S.mode));
+ const sub=ss.find(r=>r.s.id===c.sid)||ss.sort((a,b)=>b.score-a.score)[0]||null;S.risk={from:c,alt,sub};}
+const status=o=>({placed:'Placed',accepted:'Rider assigned',picked:'Out for delivery',delivered:'Delivered'})[o.st];
+// ---------- UI helpers ----------
+const S={tab:'story',q:'Milk',mode:'reliable',cart:null,risk:null,msg:'',store:'s1',sort:'fulfil',r:60,last:[],reg:R0(),user:null,me:{lat:17.6868,lng:83.2185,src:'demo'},city:'Visakhapatnam',trav:'driving',ssort:'dist',pc:{p:'Milk',sid:'s1',qty:1},coupon:'',cerr:'',pay:null,payFail:false,rider:{id:'D1',name:'Ravi Kumar',veh:'Bike',online:false,mode:'off',loc:null,err:'',wid:null,tm:null},merr:'',perr:''};
+const inr=n=>'₹'+n.toLocaleString('en-IN'),esc=s=>String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const t=(v,g=85,w=70)=>v>=g?'ok':v>=w?'wn':'bd';
+const pill=(v,x)=>`<span class="pill ${t(v)}">${x}</span>`;
+const meter=(v,c)=>`<div class="meter"><i style="width:${v}%;background:${c||'var(--pri)'}"></i></div>`;
+const kpi=(l,v,s,bad)=>`<div class="card" style="margin:0"><div class="mut">${l}</div><div class="big">${v}</div><div class="mut" style="${bad?'color:var(--bf)':''}">${s}</div></div>`;
+const bars=(ti,vals,u,c)=>{const mx=Math.max(...vals);return`<div class="card" style="margin:0"><b>${ti}</b><div class="bars" style="margin-top:12px">${vals.map((v,i)=>`<div>${v}${u}<i style="height:${v/mx*70}%;background:${c}"></i>${trend.m[i]}</div>`).join('')}</div></div>`};
+const btn=(a,l,k='',d='')=>`<button class="btn ${k}" data-a="${a}" ${d}>${l}</button>`;
+const fresh=r=>({s:r.s.id,sn:r.s.name,p:r.p,pr:r.pr,eta:r.eta,inv:r.inv,dist:r.dist,qty:1});
+// ---------- Views ----------
+function story(){const st=[['Problem','Orders grew, but trust fell: cancellations 6% → 11%, repeat purchase 41% → 27%, delivery 29 → 37 min.'],['Insight','35% of cancellations come from unavailable products. Partner stores update stock only every 1–3 days.'],['Solution','Stop promising what stores cannot deliver. Route each order to the store most likely to fulfil it.'],['Product','A customer app with visible confidence, a store exception queue and an operations dashboard.'],['AI Logic','A weighted score of inventory confidence, store reliability, ETA, distance and capacity, tuned to the customer’s preference.'],['Business Impact','Fewer failed orders mean fewer tickets and better retention. Shown as a simulation, not a result.']];
+ return`<div class="hero"><h1>From growth at any cost to reliable local commerce</h1><p>NOVA Reliability tells customers how likely their order is to arrive complete, and helps 620 partner stores fix only the stock records that matter.</p><div class="chips">${btn('tab:customer','Try the customer demo')} ${btn('tab:ops','See business impact','s')}</div></div>
+ <div class="g g2" style="margin:18px 0">${st.map(([a,b],i)=>`<div class="card" style="margin:0"><div class="mut">Step ${i+1}</div><b style="font-size:18px">${a}</b><p class="mut" style="margin:6px 0 0">${b}</p></div>`).join('')}</div>
+ <div class="card" style="background:var(--soft)"><h2>Why NOVA Reliability?</h2><p style="max-width:720px;margin:0">Quick-commerce rivals compete on discounts and speed. NOVA CART’s edge is local stores with wide assortments, so its promise has to be dependable: show real availability, pick the store most likely to deliver, and substitute smartly when stock fails.</p></div>`;}
+function customer(){const {p,res}=search();S.last=res;const M=[['reliable','Most reliable'],['fastest','Fastest'],['local','Best local option']];
+ const list=!p?`<div class="card">No product matches “${esc(S.q)}”. Try Milk, Bread, Eggs, Curd, Paneer, Atta or Rice.</div>`:res.length?res.map((r,i)=>`<div class="card pop"><div class="row"><div><b>${r.s.name}</b> ${r.rank===0?'<span class="pill tag">Recommended</span>':r.rank===1?'<span class="pill tg2">Backup store</span>':''}<div class="mut">${r.p} · ${inr(r.pr)} each · delivery ${inr(bill({pr:r.pr,qty:1,dist:r.dist}).dl)} ${r.pr===Math.min(...res.map(x=>x.pr))?'<span class="pill ok">Lowest price</span>':''}</div><div style="margin-top:6px">${pill(r.inv,r.inv+'% availability confidence')}${pill(100-r.eta,r.eta+' min ETA')}${pill(r.rel,r.rel+'% store reliability')}</div><div class="mut">${r.dist} km away · store workload ${r.load}%</div></div><div style="text-align:right"><div class="big" style="color:var(--pri)">${r.score}</div><div class="mut">reliability score</div><div style="margin-top:8px">${btn('add:'+i,'Add to cart')} <a class="btn s" href="${navUrl(r.s)}" target="_blank" rel="noopener">Navigate</a></div></div></div><div style="margin-top:10px">${meter(r.score,r.score>80?'#1faa63':r.score>65?'#e0a800':'#d64545')}</div></div>`).join(''):'<div class="card">This product is unavailable at every nearby store right now.</div>';
+ const why=res.length?`<div class="card scroll"><b>Why this ranking?</b> <span class="mut">(${M.find(m=>m[0]===S.mode)[1]} weights)</span><table><tr>${['Store','Inventory','Reliability','ETA','Distance','Capacity','Local'].map(h=>`<th>${h}</th>`).join('')}</tr><tr class="mut"><td>weight</td>${['inv','rel','eta','dist','cap','local'].map(k=>`<td>${Math.round(W[S.mode][k]*100)}%</td>`).join('')}</tr>${res.map(r=>`<tr><td><b>${r.s.name}</b></td>${['inv','rel','eta','dist','cap','local'].map(k=>`<td>${r.parts[k]}</td>`).join('')}</tr>`).join('')}</table></div>`:'';
+ const c=S.cart;const cartH=S.pay&&c?payV(c):c?`<div style="font-size:14px"><div class="row" style="align-items:center"><b>${c.p}</b><span>${btn('qty:-1','−','s')} <b>${c.qty}</b> ${btn('qty:1','+','s')}</span></div><div class="mut">${c.sn} · ${c.eta} min · ${c.inv}% confidence</div>${billH(c,S.coupon)}${couponUI()}<div class="chips">${btn('place','Continue to payment · '+inr(bill(c,S.coupon).total))}${btn('sim','Simulate stock-out','d')}${btn('clear','Clear','s')}</div></div>`:'<p class="mut">Add a product from a recommended store to start.</p>';
+ const rk=S.risk,sw=x=>`<div class="card" style="margin:0 0 8px;background:var(--card)"><b>${x[0]}</b><div style="font-size:14px">${x[1]}</div><div style="margin-top:8px">${btn('swap:'+x[2],x[3])}</div></div>`;
+ const riskH=rk?`<div class="card warnbox pop"><b>${rk.from.p} just became unavailable at ${rk.from.sn}</b><p class="mut" style="margin:4px 0 10px">Choose a fix before the order is confirmed.</p>${rk.alt?sw(['Same product, other store',`${rk.alt.s.name} · ${rk.alt.inv}% confidence · new ETA ${rk.alt.eta} min`,'alt','Switch store']):''}${rk.sub?sw(['Substitute product',`${rk.sub.p} at ${rk.sub.s.name} · ${inr(rk.sub.pr)} · ${rk.sub.inv}% confidence · ETA ${rk.sub.eta} min`,'sub','Accept substitute']):''}${btn('dismiss','Dismiss','s')}</div>`:'';
+ const ord=orders.length?orders.map(o=>{const s=status(o);return`<div style="border-top:1px solid var(--line);padding:8px 0;font-size:14px"><div class="row"><b>${o.id}</b>${pill(s==='Delivered'?100:75,s)}</div><div class="mut">${o.item.p} × ${o.item.qty} · ${o.item.sn} · ${inr(o.bd.total)} paid via ${o.pay.label} · ETA ${o.item.eta} min · ${o.item.inv}% confidence</div>${meter({Placed:15,'Rider assigned':40,'Out for delivery':75,Delivered:100}[s],'#1faa63')}</div>`}).join(''):'<p class="mut">No orders yet.</p>';
+ return`<div class="cols"><div><input type="text" id="q" value="${esc(S.q)}" placeholder="Search milk, bread, eggs…" aria-label="Search products"><div class="chips">${M.map(m=>`<button class="chip ${S.mode===m[0]?'on':''}" data-a="mode:${m[0]}">${m[1]}</button>`).join('')}</div>${list}${why}</div>
+ <div><div class="card"><b>Your cart</b><div style="margin-top:8px">${cartH}</div>${S.msg?`<div class="pill ok pop" style="margin-top:10px">${S.msg}</div>`:''}</div>${riskH}${orders.filter(o=>o.st!=='delivered').map(trackV).join('')}<div class="card"><div class="row"><b>Order history</b><button class="chip" data-a="reset">Reset demo</button></div>${ord}</div></div></div>`;}
+function store(){const s=stores.find(x=>x.id===S.store);const live=orders.filter(o=>o.item.s===s.id&&status(o)!=='Delivered').length;const load=Math.min(100,Math.round(s.load*100+live*8));
+ const ex=exc.filter(e=>e.sid===s.id&&e.open),os=orders.filter(o=>o.item.s===s.id),its=inv.concat().filter(i=>i.sid===s.id);
+ return`<div class="row" style="margin-bottom:14px;align-items:center"><b>Store</b><select id="st" style="max-width:300px">${stores.map(x=>`<option value="${x.id}" ${x.id===S.store?'selected':''}>${x.name}</option>`).join('')}</select></div>
+ <div class="g g4" style="margin-bottom:14px">${kpi('Fulfilment score',s.fulfil+'%','last 30 days')}${kpi('Workload',load+'%',load>70?'Busy period: new orders will be slowed':'Capacity available',load>70)}${kpi('Open stock questions',ex.length,'only these need your attention',ex.length>0)}</div>
+ <div class="g g2"><div class="card"><b>Inventory exception queue</b>${ex.length?ex.map(e=>`<div class="pop" style="border-top:1px solid var(--line);padding:10px 0"><div class="row"><b>${e.p}</b>${pill(e.conf,e.conf+'% confidence')}</div><div class="mut">${e.why}</div><div class="chips">${btn('res:'+e.id+':1','Yes, in stock')}${btn('res:'+e.id+':0','Out of stock','d')}</div></div>`).join(''):'<p class="mut">All clear. No uncertain products right now.</p>'}</div>
+ <div class="card"><b>Today’s orders</b>${os.length?os.map(o=>`<div class="row" style="border-top:1px solid var(--line);padding:8px 0;font-size:14px"><span><b>${o.id}</b> · ${o.item.p}</span>${pill(status(o)==='Delivered'?100:75,status(o))}</div>`).join(''):'<p class="mut">No orders yet. Place one from the Customer tab.</p>'}</div></div>
+ <div class="card scroll"><b>Manage availability</b><table>${its.map(i=>`<tr><td>${i.p}</td><td>${inr(i.pr)}</td><td>${pill(i.conf,i.on?i.conf+'%':'Unavailable')}</td><td style="text-align:right">${btn('tog:'+i.p,i.on?'Mark unavailable':'Mark available','s')}</td></tr>`).join('')}</table></div>`;}
+function imp(){const b=base,f=S.r/100;const cancel=+(b.cancel-b.cancel*b.unavail/100*f).toFixed(1),repeat=+(b.repeat+(b.cancel-cancel)*1.5).toFixed(1),tk=Math.round(b.tickets*(.55+.45*cancel/b.cancel)),sv=Math.round(b.orders*(b.cancel-cancel)/100);
+ return`<div class="g g4">${kpi('Cancellation',cancel+'%','from '+b.cancel+'%')}${kpi('Repeat purchase',repeat+'%','from '+b.repeat+'%')}${kpi('Support tickets',tk.toLocaleString('en-IN'),'from '+b.tickets.toLocaleString('en-IN'))}${kpi('Orders recovered / month',sv.toLocaleString('en-IN'),'≈ '+inr(sv*b.aov)+' GMV')}</div>`;}
+function ops(){const b=base;const rows=stores.map(s=>({...s,acc:Math.round(s.rel*100-6)})).sort((a,z)=>z[S.sort]-a[S.sort]);
+ return`<div class="g g4" style="margin-bottom:14px">${kpi('Monthly orders',b.orders.toLocaleString('en-IN'),orders.length+' placed in this demo')}${kpi('Cancellation rate','11%','up from 6%',1)}${kpi('Repeat purchase','27%','down from 41%',1)}${kpi('Support tickets / month','5,900','up from 3,100',1)}</div>
+ <div class="g g4" style="margin-bottom:14px">${bars('Repeat purchase %',trend.repeat,'%','#5b4bd5')}${bars('Cancellation %',trend.cancel,'%','#d64545')}${bars('Delivery (min)',trend.delivery,'','#e0a800')}${bars('Support tickets',trend.tickets,'','#8a5be0')}</div>
+ <div class="card" style="border:2px solid var(--pri)"><div class="row"><h2>Potential impact</h2><span class="pill wn">Simulation, not actual results</span></div>
+ <label class="mut">Share of availability-driven cancellations prevented: <b id="rv">${S.r}%</b><input type="range" id="r" min="0" max="100" value="${S.r}" style="width:100%;accent-color:#5b4bd5"></label><div id="imp" style="margin-top:10px">${imp()}</div>
+ <p class="mut">Assumptions: 35% of cancellations are caused by unavailability; each 1-point drop in cancellations adds 1.5 points of repeat purchase; tickets fall with cancellations (45% of tickets assumed cancellation-related).</p></div>
+ <div class="card scroll"><div class="row"><b>Store performance</b><select id="so" style="max-width:220px"><option value="fulfil" ${S.sort==='fulfil'?'selected':''}>Sort: fulfilment</option><option value="acc" ${S.sort==='acc'?'selected':''}>Sort: inventory accuracy</option><option value="orders" ${S.sort==='orders'?'selected':''}>Sort: orders</option></select></div>
+ <table><tr><th>Store</th><th>Orders</th><th>Fulfilment</th><th>Inventory accuracy</th><th>Avg ETA</th></tr>${rows.map(s=>`<tr><td><b>${s.name}</b></td><td>${s.orders}</td><td>${pill(s.fulfil,s.fulfil+'%')}</td><td>${pill(s.acc,s.acc+'%')}</td><td>${s.eta} min</td></tr>`).join('')}</table></div>`;}
+function R0(){return{role:'customer',step:1,f:{},err:'',m:null,e:null,exp:0,tries:0}}
+const otp=()=>String(Math.floor(100000+Math.random()*900000));
+let accts=[];
+const mask=m=>'+91 •••••'+m.slice(-4);
+function field(n,l,ph,mode){return`<label class="mut" style="display:block;margin-bottom:10px">${l}<input type="text" data-f="${n}" value="${esc(S.reg.f[n]||'')}" placeholder="${ph}" ${mode?`inputmode="${mode}"`:''} autocomplete="off" style="margin-top:4px"></label>`}
+function join(){const g=S.reg,v=g.role==='vendor';
+ if(S.user){const u=S.user;return`<div class="card pop" style="max-width:560px;margin:0 auto"><div class="row"><h2>Welcome, ${esc(u.name)}</h2><span class="pill tag">${u.role==='vendor'?'Shop vendor':'Customer'}</span></div><p class="mut">Your account ${u.id} is active. Both contact details are verified.</p><div>${pill(100,'Mobile verified · +91 '+u.mobile)}${pill(100,'Email verified · '+esc(u.email))}</div>${u.role==='vendor'?`<p style="font-size:14px">${esc(u.shop)} · ${esc(u.city)} ${esc(u.pin)}</p>`+vendorProfile(u):''}<div class="chips">${btn('tab:'+(u.role==='vendor'?'store':'customer'),u.role==='vendor'?'Open store dashboard':'Start shopping')}${btn('signout','Sign out','s')}</div></div>`}
+ const steps=['Your details','Verify mobile','Verify email'];
+ const bar=`<div class="row" style="margin-bottom:10px">${steps.map((x,i)=>`<span class="pill ${g.step===i+1?'tag':g.step>i+1?'ok':'tg2'}">${g.step>i+1?'✓ ':''}${x}</span>`).join('')}</div>`;
+ const err=g.err?`<div class="pill ${g.err.startsWith('A new')?'ok':'bd'} pop" style="display:block;margin:0 0 10px;border-radius:10px;padding:8px 10px">${g.err}</div>`:'';
+ let body;
+ if(g.step===1)body=`<div class="chips" style="margin-top:0"><button class="chip ${!v?'on':''}" data-a="role:customer">I’m a customer</button><button class="chip ${v?'on':''}" data-a="role:vendor">I’m a shop vendor</button></div>${field('name','Full name','e.g. Lakshmi Devi')}${field('mobile','Mobile number (India)','10-digit number','numeric')}${field('email','Email ID','you@example.com','email')}${v?field('shop','Shop name','e.g. Sai Lakshmi Stores')+field('city','City','e.g. Visakhapatnam')+field('pin','PIN code','6 digits','numeric'):''}${btn('next','Send mobile code')}`;
+ else{const isM=g.step===2,code=isM?g.m:g.e;
+  body=`<p style="margin-top:0">Enter the 6-digit code sent to <b>${isM?mask(g.f.mobile):esc(g.f.email)}</b>. It expires in 2 minutes.</p><input type="text" data-f="code" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="one-time-code" aria-label="Verification code" style="font-size:22px;letter-spacing:8px;text-align:center;margin-bottom:10px"><div class="chips" style="margin-top:0">${btn(isM?'vm':'ve',isM?'Verify mobile':'Verify email and finish')}${btn('resend','Resend code','s')}${btn('back','Edit details','s')}</div><div class="card" style="background:var(--soft);margin:12px 0 0"><div class="mut"><b>Demo inbox</b> · ${isM?'SMS to '+mask(g.f.mobile):'Email to '+esc(g.f.email)}</div><div class="big" style="letter-spacing:4px">${code}</div><div class="mut">No real message is sent from this prototype. A live version would send this code through an SMS and email provider.</div></div>`}
+ return`<div class="card" style="max-width:560px;margin:0 auto"><h2>Create your NOVA CART account</h2><p class="mut" style="margin-top:0">Two-step verification: we confirm your mobile number, then your email ID.</p>${bar}${err}${body}</div>`}
+function chk(key){const g=S.reg;
+ if(Date.now()>g.exp){g.err='This code expired. Select “Resend code”.';return false}
+ if(g.f.code!==g[key]){g.tries++;
+  if(g.tries>=3){S.reg=Object.assign(R0(),{f:{...g.f,code:''},role:g.role,err:'Three wrong codes. Check your details and start again.'});return false}
+  g.err='That code doesn’t match. '+(3-g.tries)+' attempt(s) left.';return false}
+ g.err='';g.tries=0;g.f.code='';g.exp=Date.now()+12e4;return true}
+function regAct(a,x){const g=S.reg,f=g.f;
+ if(a==='role'){g.role=x;g.err=''}
+ else if(a==='next'){const m=(f.mobile||'').replace(/\s/g,'');f.mobile=m;
+  const e=(f.name||'').trim().length<2?'Enter your full name.':!/^[6-9]\d{9}$/.test(m)?'Enter a valid 10-digit Indian mobile number starting with 6–9.':!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((f.email||'').trim())?'Enter a valid email ID.':g.role==='vendor'&&(!(f.shop||'').trim()||!(f.city||'').trim())?'Enter your shop name and city.':g.role==='vendor'&&!/^\d{6}$/.test(f.pin||'')?'Enter a 6-digit PIN code.':accts.some(u=>u.mobile===m)?'This mobile number is already registered.':accts.some(u=>u.email.toLowerCase()===f.email.trim().toLowerCase())?'This email ID is already registered.':'';
+  if(e){g.err=e;return}
+  g.err='';g.step=2;g.m=otp();g.exp=Date.now()+12e4;g.tries=0;f.code=''}
+ else if(a==='vm'){if(chk('m')){g.step=3;g.e=otp()}}
+ else if(a==='ve'){if(chk('e')){const u={id:(g.role==='vendor'?'V':'C')+(1000+accts.length+1),role:g.role,name:f.name.trim(),mobile:f.mobile,email:f.email.trim(),shop:f.shop,city:f.city,pin:f.pin};accts.push(u);S.user=u}}
+ else if(a==='resend'){g[g.step===2?'m':'e']=otp();g.exp=Date.now()+12e4;g.tries=0;g.err='A new code was sent.';f.code=''}
+ else if(a==='back'){g.step=1;g.err=''}
+ else if(a==='signout'){S.user=null;S.reg=R0()}}
+// ---------- Locations, navigation, photos ----------
+const inIndia=p=>p[0]>6.5&&p[0]<37.5&&p[1]>68&&p[1]<97.5;
+function parseLL(t){t=(t||'').trim();const R=[/@(-?\d+\.\d+),(-?\d+\.\d+)/,/[?&](?:q|query|ll|destination)=(-?\d+\.\d+)(?:,|%2C)(-?\d+\.\d+)/,/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/,/^(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)$/];
+ for(const r of R){const m=t.match(r);if(m)return[+m[1],+m[2]]}return null}
+const hav=(a,b)=>{const q=Math.PI/180,dl=(b.lat-a.lat)*q,dg=(b.lng-a.lng)*q,x=Math.sin(dl/2)**2+Math.cos(a.lat*q)*Math.cos(b.lat*q)*Math.sin(dg/2)**2;return 12742*Math.asin(Math.sqrt(x))};
+const SPD={driving:25,'two-wheeler':28,walking:5,bicycling:12,transit:18},HW={driving:50,'two-wheeler':40,walking:5,bicycling:15,transit:35};
+const cityMe=()=>{const c=CITY[S.city]||CITY.Visakhapatnam;return{lat:c[0],lng:c[1],src:'demo'}};
+const fm=m=>m<90?m+' min':Math.floor(m/60)+' h '+(m%60)+' min';
+const navUrl=s=>`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=${S.trav}`+(S.me.src!=='demo'?`&origin=${S.me.lat},${S.me.lng}`:'');
+const GEOERR='Location access was blocked in this browser. Paste a Google Maps link or “latitude, longitude” instead.';
+function allShops(){return[...stores.map(x=>({...x,kind:'sample'})),...LISTED.map(x=>({...x,kind:'sample'})),...accts.filter(u=>u.role==='vendor'&&u.lat!=null).map(u=>({id:u.id,name:u.shop,city:u.city,addr:u.addr,photo:u.photo,lat:u.lat,lng:u.lng,kind:'new'}))]}
+function vendorProfile(u){const f=S.reg.f,has=u.lat!=null;
+ return`<div style="border-top:1px solid var(--line);margin-top:14px;padding-top:14px"><b>Shop profile</b><div style="margin:6px 0">${pill(u.photo?100:50,u.photo?'Photo added':'Photo needed')}${pill(has?100:50,has?'Location saved · listed for customers':'Location needed to be listed')}</div>
+ ${S.perr?`<div class="pill bd" style="display:block;border-radius:10px;padding:8px 10px;margin:8px 0">${S.perr}</div>`:''}
+ <div class="mut" style="margin-top:8px">Shop photo (JPG, PNG or WebP, up to 5 MB)</div>${u.photo?`<img class="ph" src="${u.photo}" alt="Photo of ${esc(u.shop)}">`:''}
+ <div class="chips" style="margin-top:6px"><input type="file" id="photo" accept="image/jpeg,image/png,image/webp" aria-label="Upload shop photo">${u.photo?btn('rmphoto','Remove photo','d'):''}</div>
+ <div class="mut" style="margin:10px 0 4px">Shop location on Google Maps</div>
+ ${field('plink','Google Maps link or latitude, longitude','https://www.google.com/maps/@17.68,83.21,17z  or  17.6868, 83.2185')}${field('addr','Address or landmark','e.g. Near the bus stand')}
+ <div class="chips" style="margin-top:0">${btn('saveloc','Save location')}${btn('gps','Use my current location','s')}<a class="btn s" href="https://www.google.com/maps" target="_blank" rel="noopener">Open Google Maps</a></div>
+ <p class="mut" style="margin:6px 0 0">In Google Maps, find your shop, drop a pin, tap Share and copy the link. Short links (maps.app.goo.gl) can’t be read here: open one, then copy the full address from the browser bar.</p>
+ ${has?`<p style="font-size:14px">Saved: ${u.lat.toFixed(5)}, ${u.lng.toFixed(5)} · <a href="https://www.google.com/maps/search/?api=1&query=${u.lat},${u.lng}" target="_blank" rel="noopener" style="color:var(--pri)">Check on Google Maps</a></p>`:''}</div>`}
+function handlePhoto(inp){const f=inp.files[0];if(!f||!S.user)return;S.perr='';
+ if(!/^image\/(jpeg|png|webp)$/.test(f.type)){S.perr='Upload a JPG, PNG or WebP photo.';render();return}
+ if(f.size>5*1024*1024){S.perr='The photo is over 5 MB. Choose a smaller one.';render();return}
+ const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);S.user.photo=c.toDataURL('image/jpeg',.8);render()};im.onerror=()=>{S.perr='That file could not be read as an image.';render()};im.src=rd.result};rd.readAsDataURL(f)}
+function shopAct(a,x){const f=S.reg.f;S.perr='';S.merr='';
+ if(a==='saveloc'){const q=parseLL(f.plink);if(!q)S.perr='No coordinates found. Paste the full Google Maps link or type latitude, longitude.';else if(!inIndia(q))S.perr='That point is outside India. Check the link.';else Object.assign(S.user,{lat:q[0],lng:q[1],addr:(f.addr||'').trim()})}
+ else if(a==='mesave'){const q=parseLL(f.melink);if(!q)S.merr='No coordinates found. Paste the full Google Maps link or type latitude, longitude.';else if(!inIndia(q))S.merr='That point is outside India.';else S.me={lat:q[0],lng:q[1],src:'link'}}
+ else if(a==='gps'||a==='megps'){if(!navigator.geolocation){if(a==='gps')S.perr=GEOERR;else S.merr=GEOERR;return}
+  navigator.geolocation.getCurrentPosition(pos=>{const q=[pos.coords.latitude,pos.coords.longitude];if(a==='gps')Object.assign(S.user,{lat:q[0],lng:q[1],addr:(f.addr||'').trim()});else S.me={lat:q[0],lng:q[1],src:'gps'};render()},()=>{if(a==='gps')S.perr=GEOERR;else S.merr=GEOERR;render()},{timeout:8000})}
+ else if(a==='rmphoto'){delete S.user.photo}
+ else if(a==='medemo'){S.me=cityMe()}
+ else if(a==='city'){S.city=x;if(S.me.src==='demo')S.me=cityMe()}
+ else if(a==='trav'){S.trav=x}}
+function mapSvg(list){const pts=[S.me,...list],la=pts.map(q=>q.lat),ln=pts.map(q=>q.lng),a=Math.min(...la),b=Math.max(...la),c=Math.min(...ln),d=Math.max(...ln),W=320,H=190,P=24;
+ const X=v=>P+(d===c?.5:(v-c)/(d-c))*(W-2*P),Y=v=>H-P-(b===a?.5:(v-a)/(b-a))*(H-2*P);
+ return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;background:var(--soft);border-radius:14px" role="img" aria-label="Schematic map of your position and nearby shops">${list.map((q,i)=>`<line x1="${X(S.me.lng)}" y1="${Y(S.me.lat)}" x2="${X(q.lng)}" y2="${Y(q.lat)}" stroke="var(--mut)" stroke-dasharray="3 4" opacity=".5"/><circle cx="${X(q.lng)}" cy="${Y(q.lat)}" r="11" fill="#1faa63"/><text x="${X(q.lng)}" y="${Y(q.lat)+4}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${i+1}</text>`).join('')}<circle cx="${X(S.me.lng)}" cy="${Y(S.me.lat)}" r="8" fill="#5b4bd5" stroke="#fff" stroke-width="3"/><text x="${X(S.me.lng)+12}" y="${Y(S.me.lat)+4}" font-size="11" font-weight="700" fill="currentColor">You</text></svg>`}
+function shopsV(){const list=allShops().filter(q=>S.city==='all'||q.city===S.city).map(q=>({...q,km:hav(S.me,q)})).sort((a,b)=>S.ssort==='rel'?(b.rel||0)-(a.rel||0):a.km-b.km);
+ const T=[['driving','Car'],['two-wheeler','Two-wheeler'],['bicycling','Cycle'],['walking','Walk'],['transit','Bus / metro']];
+ const src={demo:'demo location (city centre)',gps:'your device location',link:'your Google Maps link'}[S.me.src];
+ return`<div class="cols"><div><div class="chips" style="margin-top:0">${['all',...Object.keys(CITY)].map(c=>`<button class="chip ${S.city===c?'on':''}" data-a="city:${c}">${c==='all'?'All cities':c}</button>`).join('')}</div>${list.map((q,i)=>{const mins=Math.max(1,Math.round(q.km*1.35/(q.km>15?HW:SPD)[S.trav]*60));
+  return`<div class="card pop"><div style="display:flex;gap:14px">${q.photo?`<img class="thumb" src="${q.photo}" alt="Photo of ${esc(q.name)}">`:`<div class="thumb">${esc(q.name[0])}</div>`}<div style="flex:1"><div class="row"><b>${i+1}. ${esc(q.name)}</b><span class="pill ${q.kind==='new'?'tag':'tg2'}">${q.kind==='new'?'New partner':'Sample store'}</span></div>
+  <div class="mut">${q.addr?esc(q.addr)+' · ':''}${q.city?esc(q.city)+' · ':''}${q.kind==='sample'?'Reliability '+Math.round(q.rel*100)+'%':'No fulfilment history yet'}</div>
+  <div style="margin:6px 0">${pill(100-q.km*10,q.km.toFixed(1)+' km straight line')}${pill(100-mins,'≈ '+fm(mins)+' by '+T.find(t=>t[0]===S.trav)[1].toLowerCase())}</div>
+  <a class="btn" href="${navUrl(q)}" target="_blank" rel="noopener">Navigate in Google Maps</a></div></div></div>`}).join('')}</div>
+ <div><div class="card"><b>Your location</b><div class="mut">Using ${src}: ${S.me.lat.toFixed(4)}, ${S.me.lng.toFixed(4)}</div>${S.merr?`<div class="pill bd" style="display:block;border-radius:10px;padding:8px 10px;margin:8px 0">${S.merr}</div>`:''}
+ <div class="chips">${btn('megps','Use my location')}${btn('medemo','Demo location','s')}</div>${field('melink','Or paste a Google Maps link / latitude, longitude','17.6868, 83.2185')}${btn('mesave','Set location','s')}</div>
+ <div class="card"><b>Travel mode</b><div class="chips">${T.map(t=>`<button class="chip ${S.trav===t[0]?'on':''}" data-a="trav:${t[0]}">${t[1]}</button>`).join('')}</div><label class="mut">Sort shops by<select id="ssort" style="margin-top:4px"><option value="dist" ${S.ssort==='dist'?'selected':''}>Nearest first</option><option value="rel" ${S.ssort==='rel'?'selected':''}>Most reliable first</option></select></label></div>
+ <div class="card"><b>Where they are</b>${mapSvg(list)}<div class="mut">Schematic view, not to scale. Navigate opens turn-by-turn directions in Google Maps. Travel times are rough estimates.</div></div></div></div>`}
+// ---------- Transparent pricing ----------
+const COUPONS={WELCOME20:{min:100,off:()=>20,txt:'₹20 off orders of ₹100 or more'},NOVA10:{min:150,off:i=>Math.min(50,Math.round(i*.1)),txt:'10% off (up to ₹50) on ₹150 or more'}};
+function bill(c,code){const items=c.pr*c.qty,free=items>=299,dl=free?0:Math.round(15+Math.max(0,c.dist-2)*5),sm=items<60?15:0,pf=2,gst=Math.round((dl+sm+pf)*.18),cp=COUPONS[code],dc=cp&&items>=cp.min?cp.off(items):0;
+ return{items,dl,sm,pf,gst,dc,free,total:items+dl+sm+pf+gst-dc,toFree:Math.max(0,299-items),toSm:Math.max(0,60-items)}}
+function billH(c,code){const b=bill(c,code),cp=COUPONS[code];
+ const L=(l,n,v,neg)=>`<div class="row" style="padding:6px 0;border-top:1px solid var(--line);font-size:14px;flex-wrap:nowrap"><div><div>${l}</div><div class="mut" style="font-size:12px">${n}</div></div><b style="white-space:nowrap;${neg?'color:var(--okf)':''}">${neg?'− ':''}${v}</b></div>`;
+ return`<div style="margin:8px 0">${L('Items · '+inr(c.pr)+' × '+c.qty,'Set by '+esc(c.sn)+'. GST is already included.',inr(b.items))}${L('Delivery fee',b.free?'Free on items of ₹299 or more':'₹15 base + ₹5 per km beyond 2 km ('+c.dist+' km away)',b.free?'Free':inr(b.dl))}${b.sm?L('Small-order fee','Applies when items are under ₹60',inr(b.sm)):''}${L('Platform fee','Covers payments and support. Same on every order.',inr(b.pf))}${L('GST on fees (18%)','On delivery, platform and small-order fees',inr(b.gst))}${b.dc?L('Coupon '+code,cp.txt,inr(b.dc),1):''}
+ <div class="row" style="padding:10px 0 6px;border-top:2px solid var(--ink);align-items:center"><b>Total payable</b><span class="big">${inr(b.total)}</span></div>
+ ${code&&cp&&!b.dc?`<div class="pill wn">${code} needs ${inr(cp.min)} of items</div> `:''}${b.toFree>0?`<div class="pill wn">Add ${inr(b.toFree)} more for free delivery</div> `:'<div class="pill ok">Free delivery unlocked</div> '}${b.sm?`<div class="pill wn">Add ${inr(b.toSm)} more to remove the small-order fee</div>`:''}
+ <div class="mut" style="margin-top:6px">No other charges. This total is what you pay.</div></div>`}
+const couponUI=()=>`<div class="chips" style="margin:0 0 8px"><input type="text" data-f="coupon" value="${esc(S.reg.f.coupon||'')}" placeholder="Coupon code" aria-label="Coupon code" style="flex:1;min-width:120px">${btn('coupon','Apply','s')}</div>${S.cerr?`<div class="pill bd">${S.cerr}</div>`:''}${S.coupon?`<div class="pill ok">${S.coupon} applied</div> <button class="chip" data-a="rmcoupon">Remove</button>`:''}`;
+function pricingV(){const g=S.pc,names=[...new Set(cat.map(c=>c[0]))],have=inv.filter(i=>i.p===g.p&&i.on),row=have.find(i=>i.sid===g.sid)||have[0],st=row&&stores.find(x=>x.id===row.sid);
+ const sel=(k,cur,opts)=>`<select data-pc="${k}" style="margin:4px 0 10px">${opts.map(o=>`<option value="${o[0]}" ${String(o[0])===String(cur)?'selected':''}>${o[1]}</option>`).join('')}</select>`;
+ const c=row?{pr:row.pr,qty:+g.qty,dist:st.dist,p:g.p,sn:st.name}:null;
+ const rules=[['Item price','Set by each store, GST included. Prices can differ by store, so the cheapest one is tagged “Lowest price”. We rank by reliability first.'],['Delivery fee','₹15 base + ₹5 per km beyond 2 km. Free when items total ₹299 or more.'],['Small-order fee','₹15 when items total under ₹60.'],['Platform fee','₹2 per order.'],['GST','18% on the three fees above. Not added on top of item prices.'],['Coupons','WELCOME20: ₹20 off items of ₹100+. NOVA10: 10% off, up to ₹50, on ₹150+.'],['Payment methods','UPI (PhonePe, Paytm, FamPay or any UPI ID), credit and debit cards, and net banking. No extra charge for any method.']];
+ return`<div class="cols"><div class="card"><h2>Price calculator</h2><p class="mut" style="margin-top:0">Choose a product, store and quantity to see exactly what you would pay before adding anything to your cart.</p>
+ <label class="mut">Product${sel('p',g.p,names.map(n=>[n,n]))}</label><label class="mut">Store${sel('sid',row&&row.sid,have.map(i=>[i.sid,stores.find(x=>x.id===i.sid).name+' · '+inr(i.pr)]))}</label><label class="mut">Quantity${sel('qty',g.qty,[1,2,3,4,5,6,8,10].map(n=>[n,n]))}</label>${c?billH(c,''):'<p class="mut">This product is unavailable at every store right now.</p>'}</div>
+ <div><div class="card"><h2>How we price an order</h2><table>${rules.map(([a,b])=>`<tr><td style="white-space:nowrap"><b>${a}</b></td><td>${b}</td></tr>`).join('')}</table></div>
+ <div class="card" style="background:var(--soft)"><b>Our pricing promise</b><p style="margin:6px 0 0;font-size:14px">Every line appears in your cart before you confirm, and the total you see is the total you pay. Fees and coupons here are sample values for this prototype.</p></div></div></div>`}
+// ---------- Payments (simulated) ----------
+const PML={phonepe:'PhonePe',paytm:'Paytm',fampay:'FamPay',upiid:'UPI ID',card:'Card',netbank:'Net banking'};
+const BANKS=['State Bank of India','HDFC Bank','ICICI Bank','Axis Bank','Kotak Mahindra Bank','Union Bank of India','Bank of Baroda','Canara Bank'];
+const brand=d=>/^4/.test(d)?'Visa':/^(5[1-5]|2[2-7])/.test(d)?'Mastercard':/^3[47]/.test(d)?'American Express':/^(60|65|81|82|508)/.test(d)?'RuPay':d?'Card':'';
+const luhn=n=>{let t=0,alt=false;for(let i=n.length-1;i>=0;i--){let d=+n[i];if(alt){d*=2;if(d>9)d-=9}t+=d;alt=!alt}return t%10===0};
+const wipe=()=>['cardno','cardname','cardexp','cardcvv','upiid'].forEach(k=>delete S.reg.f[k]);
+function payCheck(){const P=S.pay,f=S.reg.f,m=P.method;
+ if(m==='upiid'&&!/^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$/.test((f.upiid||'').trim()))return'Enter a valid UPI ID, like name@okaxis.';
+ if(m==='netbank'&&!P.bank)return'Choose your bank.';
+ if(m==='card'){const d=(f.cardno||'').replace(/\s/g,'');
+  if(d.length<13||!luhn(d))return'Check the card number. The digits don’t add up.';
+  if((f.cardname||'').trim().length<2)return'Enter the name on the card.';
+  const mm=(f.cardexp||'').match(/^(0[1-9]|1[0-2])\/(\d\d)$/);if(!mm)return'Enter the expiry as MM/YY.';
+  const now=new Date(),y=2000+ +mm[2];if(y<now.getFullYear()||(y===now.getFullYear()&&+mm[1]<now.getMonth()+1))return'This card has expired.';
+  const need=brand(d)==='American Express'?4:3,v=f.cardcvv||'';if(v.length!==need||!/^[0-9]+$/.test(v))return'Enter the '+need+'-digit CVV.'}
+ return''}
+function payAct(a,x){const P=S.pay;
+ if(a==='pm'){P.method=x;P.err=''}
+ else if(a==='bank'){P.bank=BANKS[+x];P.err=''}
+ else if(a==='ctype'){P.ctype=x}
+ else if(a==='paycancel'){S.pay=null;wipe()}
+ else if(a==='pf'){S.payFail=!S.payFail}
+ else if(a==='pay'){const e=payCheck();if(e){P.err=e;return}P.err='';P.step='processing';setTimeout(finishPay,2200)}}
+function finishPay(){const P=S.pay,f=S.reg.f;if(!P||!S.cart)return;
+ if(S.payFail){P.step='choose';P.err='The payment didn’t go through and you weren’t charged. Try again or choose another method.';delete f.cardcvv;render();return}
+ const d=(f.cardno||'').replace(/\s/g,''),u=(f.upiid||'').trim();
+ const detail=P.method==='card'?(P.ctype==='credit'?'Credit':'Debit')+' card •••• '+d.slice(-4)+' ('+brand(d)+')':P.method==='upiid'?u.slice(0,2)+'••••@'+u.split('@')[1]:P.method==='netbank'?P.bank:'';
+ const pay={label:P.method==='card'?(P.ctype==='credit'?'credit card':'debit card'):PML[P.method],detail,txn:'TXN'+Math.floor(1e9+Math.random()*9e9)};
+ const o={id:'NC'+(1001+orders.length),item:S.cart,bd:bill(S.cart,S.coupon),pay,t:Date.now(),st:'placed',code:String(Math.floor(1000+Math.random()*9000)),drop:{lat:S.me.lat,lng:S.me.lng},trail:[]};
+ orders.unshift(o);sync();S.msg='Paid '+inr(o.bd.total)+' via '+pay.label+(detail?' ('+detail+')':'')+'. Order '+o.id+' confirmed with '+o.item.sn+'. Track it below. Ref '+pay.txn;S.cart=null;S.coupon='';S.pay=null;wipe();render()}
+function payV(c){const P=S.pay,f=S.reg.f,b=bill(c,S.coupon),m=P.method;
+ if(P.step==='processing'){const t=['phonepe','paytm','fampay'].includes(m)?'Waiting for your approval in '+PML[m]+'…':m==='upiid'?'Sending a request to your UPI app…':m==='card'?'Securing your card payment…':'Redirecting to '+P.bank+'…';
+  return`<div class="pop" style="text-align:center;padding:18px 0"><div class="spin"></div><b>${t}</b><div class="mut" style="margin-top:6px">Keep this page open. You’ll be charged ${inr(b.total)}.</div></div>`}
+ let det='';
+ if(['phonepe','paytm','fampay'].includes(m))det=`<div class="mut">We’ll send a payment request to your ${PML[m]} app. Approve it there to finish.${m==='fampay'?' FamPay is a teen-friendly UPI option.':''}</div>`;
+ if(m==='upiid')det=field('upiid','Your UPI ID','name@okaxis');
+ if(m==='netbank')det=`<div class="chips" style="margin:4px 0">${BANKS.map((x,i)=>`<button class="chip ${P.bank===x?'on':''}" data-a="bank:${i}">${x}</button>`).join('')}</div>`;
+ if(m==='card')det=`<div class="chips" style="margin:4px 0">${[['credit','Credit card'],['debit','Debit card']].map(([k,l])=>`<button class="chip ${P.ctype===k?'on':''}" data-a="ctype:${k}">${l}</button>`).join('')}</div>
+  <label class="mut" style="display:block;margin-bottom:10px">Card number <span id="brand" class="pill tg2" style="font-size:11px">${brand((f.cardno||'').replace(/\s/g,''))}</span><input type="text" data-f="cardno" inputmode="numeric" autocomplete="off" value="${esc(f.cardno||'')}" placeholder="1234 5678 9012 3456" style="margin-top:4px"></label>${field('cardname','Name on card','As printed on the card')}
+  <div class="g" style="grid-template-columns:1fr 1fr;gap:10px">${field('cardexp','Expiry (MM/YY)','MM/YY','numeric')}<label class="mut" style="display:block;margin-bottom:10px">CVV<input type="password" data-f="cardcvv" inputmode="numeric" maxlength="4" autocomplete="off" value="${esc(f.cardcvv||'')}" placeholder="•••" style="margin-top:4px"></label></div>
+  <div class="pill wn" style="display:block;border-radius:10px;padding:8px 10px">Demo only: don’t enter real card details. Use a test card such as 4111 1111 1111 1111.</div>`;
+ const opt=(id,ic,col,t,sub)=>`<button class="opt ${m===id?'on':''}" data-a="pm:${id}" aria-pressed="${m===id}"><i style="background:${col}">${ic}</i><span><b>${t}</b><br><span class="mut" style="font-size:12px">${sub}</span></span></button>${m===id?`<div style="margin:0 0 8px 4px">${det}</div>`:''}`;
+ const sec=t=>`<div class="mut" style="margin-top:10px;font-weight:600">${t}</div>`;
+ return`<div><div class="row" style="align-items:center"><b>Choose how to pay</b><span class="big">${inr(b.total)}</span></div><div class="mut">${esc(c.p)} × ${c.qty} from ${esc(c.sn)}. No extra charge for any payment method.</div>${P.err?`<div class="pill bd pop" style="display:block;border-radius:10px;padding:8px 10px;margin:8px 0">${P.err}</div>`:''}
+ ${sec('UPI apps')}${opt('phonepe','Pe','#5f259f','PhonePe','Pay with the PhonePe app')}${opt('paytm','Pt','#0a8fc4','Paytm','Pay with Paytm UPI')}${opt('fampay','Fp','#b87400','FamPay','Teen-friendly UPI')}
+ ${sec('Other UPI')}${opt('upiid','@','#3a3a6a','Enter UPI ID','Pay with any UPI ID')}${sec('Cards')}${opt('card','▭','#2a7a5a','Credit or debit card','Visa, Mastercard, RuPay, Amex')}${sec('Net banking')}${opt('netbank','⌂','#7a5230','Net banking','Pay through your bank')}
+ <div class="chips" style="margin-top:12px">${btn('pay','Pay '+inr(b.total))}${btn('paycancel','Back to cart','s')}</div><label class="mut" style="font-size:12px;display:flex;gap:6px;align-items:center"><input type="checkbox" data-a="pf" ${S.payFail?'checked':''}> Demo: simulate a failed payment</label></div>`}
+// ---------- Delivery partner + live tracking ----------
+let bc=null;try{bc=new BroadcastChannel('nova-reliability');bc.onmessage=e=>{if(e.data&&e.data.orders){orders=e.data.orders;tick()}}}catch(_){}
+const sync=()=>{try{bc&&bc.postMessage({orders})}catch(_){}};
+const tick=()=>{if(['customer','delivery','store'].includes(S.tab))render()};
+const storeOf=o=>stores.find(x=>x.id===o.item.s);
+const activeOrder=()=>orders.find(o=>(o.st==='accepted'||o.st==='picked')&&o.rider&&o.rider.id===S.rider.id);
+const payout=o=>Math.round(25+7*hav(storeOf(o),o.drop));
+const gmDir=q=>`https://www.google.com/maps/dir/?api=1&destination=${q.lat},${q.lng}&travelmode=two-wheeler`;
+function ping(lat,lng,acc,src){const r=S.rider;r.loc={lat,lng,acc:acc||0,t:Date.now(),src};const o=activeOrder();if(o){o.loc={...r.loc};o.trail=[...(o.trail||[]).slice(-80),[lat,lng]];sync()}tick()}
+function stopLoc(){const r=S.rider;if(r.wid!=null&&navigator.geolocation)navigator.geolocation.clearWatch(r.wid);r.wid=null;clearInterval(r.tm);r.tm=null;r.mode='off'}
+function startGps(){stopLoc();const r=S.rider;if(!navigator.geolocation){r.err='This browser can’t share GPS. Open the page in Chrome or Safari on your phone.';return}
+ r.mode='gps';r.wid=navigator.geolocation.watchPosition(p=>ping(p.coords.latitude,p.coords.longitude,p.coords.accuracy,'gps'),e=>{r.err=e.code===1?'Location permission was denied. Allow location for this site in your browser settings, then try again.':'No GPS fix yet. Move to an open area and try again.';r.mode='off';render()},{enableHighAccuracy:true,maximumAge:2000,timeout:20000})}
+function startSim(){stopLoc();const r=S.rider;r.mode='sim';if(!r.loc||r.loc.src==='gps')r.loc={lat:stores[0].lat-.009,lng:stores[0].lng-.006,acc:5,t:Date.now(),src:'sim'};
+ r.tm=setInterval(()=>{const o=activeOrder();if(!o)return;const tg=o.st==='accepted'?storeOf(o):o.drop,dx=tg.lat-r.loc.lat,dy=tg.lng-r.loc.lng,d=Math.hypot(dx,dy);if(d<.0004)return ping(tg.lat,tg.lng,5,'sim');const k=Math.min(1,.0003/d);ping(r.loc.lat+dx*k,r.loc.lng+dy*k,5,'sim')},1000)}
+function rideAct(a,x){const r=S.rider,f=S.reg.f;r.err='';
+ if(a==='online'){if(r.online&&activeOrder()){r.err='Finish your current delivery before going offline.';return}r.online=!r.online;if(!r.online)stopLoc()}
+ else if(a==='rgps')startGps();else if(a==='rsim')startSim();else if(a==='roff')stopLoc();
+ else if(a==='accept'){const o=orders.find(z=>z.id===x);if(!r.online){r.err='Go online first.';return}if(activeOrder()){r.err='Finish your current delivery first.';return}if(!o||o.st!=='placed'){r.err='This order was already taken.';return}
+  r.name=(f.rname||r.name).trim()||r.name;o.st='accepted';o.rider={id:r.id,name:r.name,veh:r.veh};o.tsA=Date.now();o.trail=[];if(r.loc)o.loc={...r.loc};sync()}
+ else if(a==='pickup'){const o=activeOrder();if(o&&o.st==='accepted'){o.st='picked';o.tsP=Date.now();sync()}}
+ else if(a==='deliver'){const o=activeOrder();if(!o||o.st!=='picked')return;if((f.dcode||'').trim()!==o.code){r.err='That code doesn’t match. Ask the customer for the 4-digit code shown on their screen.';return}o.st='delivered';o.tsD=Date.now();f.dcode='';sync()}}
+function deliveryV(){const r=S.rider,act=activeOrder(),avail=orders.filter(o=>o.st==='placed'),done=orders.filter(o=>o.st==='delivered'&&o.rider&&o.rider.id===r.id),earn=done.reduce((a,o)=>a+payout(o),0);
+ const loc=r.loc?`${r.loc.lat.toFixed(5)}, ${r.loc.lng.toFixed(5)} · ±${Math.round(r.loc.acc)} m · ${Math.max(0,Math.round((Date.now()-r.loc.t)/1000))} s ago`:'No location yet';
+ const head=`<div class="card"><div class="row" style="align-items:center"><div><h2 style="margin:0">Delivery partner</h2><div class="mut">${r.online?'You’re online and can receive orders':'You’re offline'}</div></div>${btn('online',r.online?'Go offline':'Go online',r.online?'d':'')}</div>
+ <div style="margin-top:10px">${field('rname','Your name','e.g. Ravi Kumar')}</div>${r.err?`<div class="pill bd pop" style="display:block;border-radius:10px;padding:8px 10px;margin-bottom:8px">${r.err}</div>`:''}
+ <b>Live location</b><div>${pill(r.mode==='off'?50:100,{off:'Sharing is off',gps:'Live GPS on',sim:'Demo route on (sped up)'}[r.mode])}</div><div class="mut">${loc}</div>
+ <div class="chips">${btn('rgps','Share live GPS')}${btn('rsim','Use demo route','s')}${r.mode!=='off'?btn('roff','Stop sharing','d'):''}</div>
+ <div class="mut" style="font-size:12px">Your location goes to the customer only while you have an active order. Keep this page open on your phone: browsers pause GPS when the screen is off.</div></div>`;
+ let actH='';
+ if(act){const s=storeOf(act),tg=act.st==='accepted'?s:act.drop,d=r.loc?hav(r.loc,tg):null,km=hav(s,act.drop);
+  actH=`<div class="card pop" style="border:2px solid var(--pri)"><div class="row"><b>Active delivery · ${act.id}</b>${pill(100,act.st==='accepted'?'Go to store':'Deliver to customer')}</div>
+  <div style="margin:6px 0">${act.item.p} × ${act.item.qty} · prepaid, no cash to collect</div>
+  <div class="mut">${act.st==='accepted'?'Pick up from '+esc(s.name):'Customer’s drop-off pin'}${d!=null?' · '+(d<1?Math.round(d*1000)+' m':d.toFixed(1)+' km')+' away':''}</div>
+  <div class="mut">Your pay: ${inr(payout(act))} (₹25 base + ₹7 × ${km.toFixed(1)} km)</div>
+  <div class="chips"><a class="btn s" href="${gmDir(tg)}" target="_blank" rel="noopener">Navigate in Google Maps</a>${act.st==='accepted'?btn('pickup','I’ve picked up the order'):''}</div>
+  ${act.st==='picked'?`${field('dcode','Customer’s 4-digit code','Ask the customer','numeric')}${btn('deliver','Complete delivery')}`:''}</div>`}
+ const list=!r.online?'<div class="card mut">Go online to see new orders.</div>':avail.length?avail.map(o=>{const s=storeOf(o),km=hav(s,o.drop),ts=r.loc?hav(r.loc,s):null;
+  return`<div class="card pop"><div class="row"><div><b>${o.id} · ${esc(o.item.p)} × ${o.item.qty}</b><div class="mut">Pick up: ${esc(s.name)}${ts!=null?' · '+ts.toFixed(1)+' km from you':''}</div><div class="mut">Drop: ${km.toFixed(1)} km from the store · prepaid</div></div><div style="text-align:right"><div class="big">${inr(payout(o))}</div><div class="mut">your pay</div>${btn('accept:'+o.id,'Accept order','',act?'disabled':'')}</div></div></div>`}).join(''):'<div class="card mut">No new orders right now. Place one from the Customer tab and it will appear here.</div>';
+ return`<div class="cols"><div>${actH}<b>New orders</b><div style="margin-top:8px">${list}</div></div><div>${head}<div class="g g2" style="margin:0 0 14px">${kpi('Deliveries',done.length,'completed')}${kpi('Earnings',inr(earn),'₹25 + ₹7 per km')}</div></div></div>`}
+function trackSvg(o){const s=storeOf(o),pts=[s,o.drop,...(o.loc?[o.loc]:[]),...(o.trail||[]).map(t=>({lat:t[0],lng:t[1]}))],la=pts.map(q=>q.lat),ln=pts.map(q=>q.lng),a=Math.min(...la),b=Math.max(...la),c=Math.min(...ln),d=Math.max(...ln),W=320,H=190,P=26;
+ const u=Math.min(W-2*P,H-2*P)/Math.max(b-a,d-c,.002),X=v=>W/2+(v-(c+d)/2)*u,Y=v=>H/2-(v-(a+b)/2)*u,tr=(o.trail||[]).map(t=>X(t[1])+','+Y(t[0])).join(' ');
+ return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;background:var(--soft);border-radius:14px" role="img" aria-label="Live map showing the shop, the rider and your location">${tr?`<polyline points="${tr}" fill="none" stroke="#5b4bd5" stroke-width="3" stroke-linecap="round" opacity=".5"/>`:''}
+ <rect x="${X(s.lng)-9}" y="${Y(s.lat)-9}" width="18" height="18" rx="4" fill="#e0a800"/><text x="${X(s.lng)}" y="${Y(s.lat)+4}" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">S</text>
+ <circle cx="${X(o.drop.lng)}" cy="${Y(o.drop.lat)}" r="10" fill="#1faa63"/><text x="${X(o.drop.lng)}" y="${Y(o.drop.lat)+4}" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">H</text>
+ ${o.loc?`<circle class="pulse" cx="${X(o.loc.lng)}" cy="${Y(o.loc.lat)}" r="9" fill="#5b4bd5"/><circle cx="${X(o.loc.lng)}" cy="${Y(o.loc.lat)}" r="8" fill="#5b4bd5" stroke="#fff" stroke-width="3"/>`:''}</svg>`}
+function trackV(o){const s=storeOf(o),loc=o.loc,steps=['Placed','Rider assigned','Out for delivery','Delivered'],i=steps.indexOf(status(o));
+ const rem=o.st==='accepted'?(loc?hav(loc,s):0)+hav(s,o.drop):o.st==='picked'&&loc?hav(loc,o.drop):null,eta=rem!=null?Math.max(1,Math.round(rem*1.3/22*60)):null,age=loc?Math.round((Date.now()-loc.t)/1000):0;
+ const line=o.st==='placed'?'Looking for a delivery partner near '+esc(s.name)+'…':o.st==='accepted'?`${esc(o.rider.name)} is heading to ${esc(s.name)} to pick up your order.`:`${esc(o.rider.name)} is on the way to you.`;
+ return`<div class="card pop" style="border:2px solid var(--pri)"><div class="row"><b>Live tracking · ${o.id}</b>${pill(75,status(o))}</div>
+ <div class="row" style="gap:4px;margin:8px 0">${steps.map((x,k)=>`<span class="pill ${k<=i?'ok':'tg2'}">${x}</span>`).join('')}</div>
+ <div style="font-size:14px"><b>${line}</b></div>${eta!=null?`<div class="mut">Arriving in about ${eta} min · ${rem.toFixed(1)} km to cover</div>`:''}
+ ${o.st!=='placed'?`<div style="margin:8px 0">${trackSvg(o)}</div><div class="mut" style="font-size:12px">S = shop, H = your drop-off, purple dot = rider. ${loc?`${loc.src==='gps'?'Live GPS from the rider’s phone':'Demo route (simulated)'} · updated ${age} s ago`:'Waiting for the rider’s first location…'}</div>${age>30?'<div class="pill wn">No location update for '+age+' s</div>':''}
+ ${loc?`<a href="https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}" target="_blank" rel="noopener" style="color:var(--pri);font-size:13px">Open rider’s position in Google Maps</a>`:''}
+ <div class="card" style="background:var(--soft);margin:10px 0 0"><div class="mut">Give this code to your rider at the door</div><div class="big" style="letter-spacing:6px">${o.code}</div></div>`:''}</div>`}
+// ---------- Render + events ----------
+const TABS=[['story','Story'],['customer','Customer'],['store','Store'],['delivery','Delivery'],['ops','Operations'],['pricing','Pricing'],['shops','Shops'],['join','Register']];
+function render(){setTimeout(()=>{if(S.tab==='join'){const c=document.querySelector('[data-f=code]');if(c)c.focus()}});const a=document.activeElement,id=a&&a.id,pos=a&&a.selectionStart,df=a&&a.dataset&&a.dataset.f;
+ document.getElementById('nav').innerHTML=TABS.map(([k,l])=>`<button class="${S.tab===k?'on':''}" data-a="tab:${k}">${k==='join'&&S.user?'Account':l}${k==='customer'&&S.cart?' (1)':''}</button>`).join('')+(S.user?`<span class="pill" style="background:#2e2670;color:#fff;margin-left:6px">${esc(S.user.name.split(' ')[0])} · ${S.user.role==='vendor'?'Vendor':'Customer'}</span>`:'');
+ document.getElementById('app').innerHTML=({story,customer,store,delivery:deliveryV,ops,pricing:pricingV,shops:shopsV,join})[S.tab]();
+ if(df&&(S.tab==='customer'||S.tab==='delivery')){const e=document.querySelector('[data-f="'+df+'"]');if(e){e.focus();try{e.setSelectionRange(pos,pos)}catch(_){}}}
+ if(id==='q'){const e=document.getElementById('q');e.focus();try{e.setSelectionRange(pos,pos)}catch(_){}}}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el)return;const [a,x,y]=el.dataset.a.split(':');
+ if(a==='tab'){S.tab=x;scrollTo(0,0)}
+ else if(a==='mode'){S.mode=x}
+ else if(a==='add'){S.cart=fresh(S.last[+x]);S.msg='';S.risk=null;S.pay=null}
+ else if(a==='clear'){S.cart=null;S.pay=null}
+ else if(a==='qty'){S.cart.qty=Math.max(1,Math.min(10,S.cart.qty+ +x))}
+ else if(a==='coupon'){const code=(S.reg.f.coupon||'').trim().toUpperCase(),cp=COUPONS[code],b=bill(S.cart);if(!cp)S.cerr='That code isn’t valid. Try WELCOME20 or NOVA10.';else if(b.items<cp.min)S.cerr='Add '+inr(cp.min-b.items)+' more to use '+code+'.';else{S.coupon=code;S.cerr=''}}
+ else if(a==='rmcoupon'){S.coupon='';S.cerr=''}
+ else if(['pm','bank','ctype','paycancel','pf','pay'].includes(a)){payAct(a,x)}
+ else if(['online','rgps','rsim','roff','accept','pickup','deliver'].includes(a)){rideAct(a,x)}
+ else if(a==='sim'){stockout()}
+ else if(a==='swap'){const r=S.risk[x];S.cart={...fresh(r),qty:S.risk.from.qty};S.risk=null;S.pay=null}
+ else if(a==='dismiss'){S.risk=null}
+ else if(a==='place'){S.pay={step:'choose',method:'phonepe',bank:'',ctype:'credit',err:''};S.msg=''}
+ else if(a==='reset'){seed();sync();S.cart=null;S.risk=null;S.msg=''}
+ else if(a==='res'){const ex=exc.find(z=>z.id===+x),row=inv.find(i=>i.sid===ex.sid&&i.p===ex.p);ex.open=false;row.on=y==='1';row.conf=y==='1'?97:0}
+ else if(a==='tog'){const row=inv.find(i=>i.sid===S.store&&i.p===x);row.on=!row.on;row.conf=row.on?95:0}
+ else if(['role','next','vm','ve','resend','back','signout'].includes(a)){regAct(a,x)}
+ else if(['saveloc','gps','rmphoto','mesave','megps','medemo','trav','city'].includes(a)){shopAct(a,x)}
+ render();});
+document.addEventListener('input',e=>{const el=e.target;if(el.dataset.f==='cardno'){const d=el.value.replace(/\D/g,'').slice(0,19);el.value=d.replace(/(.{4})/g,'$1 ').trim();const bl=document.getElementById('brand');if(bl)bl.textContent=brand(d)}
+ if(el.dataset.f==='cardexp'){const d=el.value.replace(/\D/g,'').slice(0,4);el.value=d.length>2?d.slice(0,2)+'/'+d.slice(2):d}
+ if(el.dataset.f==='cardcvv')el.value=el.value.replace(/\D/g,'').slice(0,4);
+ if(el.dataset.f){S.reg.f[el.dataset.f]=el.value;return}
+ if(el.id==='q'){S.q=el.value;render()}
+ else if(el.id==='r'){S.r=+el.value;document.getElementById('rv').textContent=S.r+'%';document.getElementById('imp').innerHTML=imp()}});
+document.addEventListener('change',e=>{if(e.target.dataset.pc){const k=e.target.dataset.pc;S.pc[k]=e.target.value;if(k==='p')S.pc.sid='';render();return}if(e.target.id==='photo'){handlePhoto(e.target);return}if(e.target.id==='ssort'){S.ssort=e.target.value;render();return}if(e.target.id==='st'){S.store=e.target.value;render()}if(e.target.id==='so'){S.sort=e.target.value;render()}});
+setInterval(()=>{if(orders.length&&(S.tab==='customer'||S.tab==='store')&&!(document.activeElement&&document.activeElement.id==='q'&&0))render()},2000);
+render();
+</script>
+</body>
+</html>
